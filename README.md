@@ -1,3 +1,3 @@
 # Fortress-Booking
 Another one booking service
-—ервис дл€ бронировани€ мест в коворкинге
+Service for a booking work spaces in a coworking
