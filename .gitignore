@@ -1,0 +1,23 @@
+## Игнорировать папки сборки и выходных файлов
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## IDE
+.vs/
+.idea/
+*.swp
+*~
+
+## NuGet
+packages/
+*.nupkg
+
+## Разное
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
