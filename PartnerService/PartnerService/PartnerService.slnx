@@ -2,5 +2,7 @@
   <Folder Name="/Tests/" />
   <Project Path="PartnerService.Core/PartnerService.Core.csproj" Id="8c777a22-bdd6-4bf7-a11b-5aeedc9e503e" />
   <Project Path="PartnerService.DataAccess/PartnerService.DataAccess.csproj" Id="acb95412-f5f7-459e-98a1-8da1e9ab1e61" />
-  <Project Path="PartnerService/PartnerService.WebHost.csproj" />
+  <Project Path="PartnerService/PartnerService.WebHost.csproj">
+    <BuildDependency Project="PartnerService.DataAccess/PartnerService.DataAccess.csproj" />
+  </Project>
 </Solution>

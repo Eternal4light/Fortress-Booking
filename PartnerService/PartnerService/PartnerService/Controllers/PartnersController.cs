@@ -1,4 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using PartnerService.Core.Abstractions.Repositories;
+using PartnerService.Core.Domain;
+using PartnerService.WebHost.Models;
+using System.Security.Cryptography.Xml;
 
 namespace PartnerService.Controllers
 {
@@ -6,18 +10,29 @@ namespace PartnerService.Controllers
     [Route("[controller]")]
     public class PartnersController : ControllerBase
     {
-        private static readonly string[] Summaries =
-        [
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        ];
+        private readonly IRepository<Partner> _partnersRepository;
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<DependencyInjection> Get()
+        public PartnersController(IRepository<Partner> partnersRepository)
         {
-            return Enumerable.Range(1, 5).Select(index => new DependencyInjection
-            {
-            })
-            .ToArray();
+            _partnersRepository = partnersRepository;
         }
+
+        /// <summary>
+        /// Получить список партнеров
+        /// </summary>
+        [HttpGet]
+        public async Task<ActionResult<List<PartnerResponse>>> GetPartnersAsync()
+        {
+            var partners = await _partnersRepository.GetAllAsync();
+
+            var response = partners.Select(x => new PartnerResponse()
+            {
+                Id = x.Id,
+                Name = x.Name
+            });
+
+            return Ok(response);
+        }
+
     }
 }

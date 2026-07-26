@@ -14,7 +14,7 @@ namespace PartnerService.Core.Domain
 
         public virtual Partner Partner { get; set; }
 
-        public virtual Activity Preference { get; set; }
+        public virtual Activity Activity { get; set; }
 
         public Guid ActivityId { get; set; }
     }

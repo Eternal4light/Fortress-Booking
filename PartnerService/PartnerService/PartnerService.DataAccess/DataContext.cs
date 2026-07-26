@@ -6,7 +6,7 @@ using System.Text;
 using PartnerService.Core.Domain;
 
 
-namespace PartnerService.DataAccess.Repositories
+namespace PartnerService.DataAccess
 {
     public class DataContext
         : DbContext

@@ -4,11 +4,10 @@ using System.Text;
 
 namespace PartnerService.Core.Domain
 {
-    public class Partner
+    public class Partner : BaseEntity
     {
-        public string Name { get; set; }
 
-        public int NumberIssuedPromoCodes { get; set; }
+        public string Name { get; set; }
 
         public bool IsActive { get; set; }
 
