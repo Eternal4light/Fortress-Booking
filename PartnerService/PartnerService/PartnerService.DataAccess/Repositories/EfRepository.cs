@@ -1,23 +1,33 @@
-﻿using PartnerService.Core.Abstractions.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
+using PartnerService.Core.Abstractions.Repositories;
 using PartnerService.Core.Domain;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace PartnerService.DataAccess.Repositories
 {
-    public class EfRepository<T> : IRepository<T> where T: BaseEntity
+    public class EfRepository<T>(DataContext context) : IRepository<T> where T: BaseEntity
     {
         private readonly DataContext _dataContext;
 
-        public EfRepository(DataContext dataContext)
-        {
-            _dataContext = dataContext;
-        }
+        protected virtual IQueryable<T> ApplyIncludes(IQueryable<T> query) => query;
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        protected readonly DataContext _context = context;
+
+        protected readonly DbSet<T> _dbSet = context.Set<T>();
+
+        public async Task<IReadOnlyCollection<T>> GetAll(bool withIncludes = false, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            IQueryable<T> query = _dbSet;
+
+        if (withIncludes)
+            query = ApplyIncludes(query);
+
+        return await query.ToListAsync(ct);
         }
 
         public async Task<T> GetByIdAsync(Guid id)
@@ -40,5 +50,9 @@ namespace PartnerService.DataAccess.Repositories
             throw new NotImplementedException();
         }
 
+        Task<IReadOnlyCollection<T>> IRepository<T>.GetAllAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

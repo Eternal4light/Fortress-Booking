@@ -7,7 +7,7 @@ namespace PartnerService.Core.Abstractions.Repositories
 {
     public interface IRepository<T>
     {
-            Task<IEnumerable<T>> GetAllAsync();
+        Task<IReadOnlyCollection<T>> GetAllAsync();
 
             Task<T> GetByIdAsync(Guid id);
 

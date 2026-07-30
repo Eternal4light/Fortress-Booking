@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PartnerService.DataAccess.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
