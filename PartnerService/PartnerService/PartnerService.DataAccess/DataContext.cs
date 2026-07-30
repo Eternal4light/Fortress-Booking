@@ -1,12 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using PartnerService.Core.Domain;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Reflection.Emit;
 using System.Text;
-using PartnerService.Core.Domain;
 
 
-namespace PartnerService.DataAccess
+namespace PartnerService.DataAccess.Repositories
 {
     public class DataContext
         : DbContext
@@ -14,10 +16,6 @@ namespace PartnerService.DataAccess
 
         public DbSet<Partner> Partners { get; set; }
 
-        public DataContext()
-        {
-
-        }
 
         public DataContext(DbContextOptions<DataContext> options)
             : base(options)
@@ -27,7 +25,15 @@ namespace PartnerService.DataAccess
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Partner>(entity =>
+            {
+                entity.Property(x => x.Name).HasMaxLength(250).IsRequired();
 
+            });
+
+
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

@@ -26,17 +26,17 @@ namespace PartnerService.WebHost
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-
-           
-
-
             services.AddControllers().AddMvcOptions(x =>
                 x.SuppressAsyncSuffixInActionNames = false);
-            services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-
+            services.AddScoped(typeof(IRepository<>), typeof(InMemoryRepository<>));
             services.AddScoped<IDbInitializer, EfDbInitializer>();
 
 
+            services.AddDbContext<DataContext>();
+
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+            services.AddOpenApi();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,7 +51,7 @@ namespace PartnerService.WebHost
                 app.UseHsts();
             }
 
-     //       app.UseOpenApi();
+           // app.UseOpenApi();
             app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
