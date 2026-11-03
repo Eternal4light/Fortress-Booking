@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>b6f7a6b1-0b6a-4b6a-9b1a-2f6b2a6b7a6b</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ocelot" Version="25.0.0" />
+  </ItemGroup>
+
+  <!-- ocelot*.json уже попадают в build/publish без явного объявления —
+       Sdk.Web по умолчанию включает файлы из папки проекта как Content
+       и копирует их в выходную директорию. -->
+
+</Project>

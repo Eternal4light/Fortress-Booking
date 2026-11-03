@@ -1,0 +1,106 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+
+  postgres:
+    image: postgres:16
+    environment:
+      - POSTGRES_DB=fortress_partners
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    # Данные — это только кэш списков /partners и /activities: при потере он просто
+    # перечитается из PostgreSQL при следующем запросе, поэтому volume для персистентности
+    # не нужен (в отличие от postgres/mongo выше).
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    command: start-dev --import-realm
+    environment:
+      # Разные версии Keycloak называют переменные бутстрап-администратора по-разному
+      # (KEYCLOAK_ADMIN/KEYCLOAK_ADMIN_PASSWORD в старых, KC_BOOTSTRAP_ADMIN_USERNAME/
+      # KC_BOOTSTRAP_ADMIN_PASSWORD начиная с 26-й). Задаём оба варианта сразу — лишние
+      # переменные Keycloak просто игнорирует, а проверить точную версию образа заранее
+      # в этой среде нельзя.
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+
+  partner-service:
+    build:
+      context: ./PartnerService/PartnerService
+      dockerfile: PartnerService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    ports:
+      - "5001:8080"
+    depends_on:
+      - rabbitmq
+      - postgres
+      - keycloak
+      - redis
+
+  user-service:
+    build:
+      context: ./UserService/UserService
+      dockerfile: UserService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    ports:
+      - "5199:8080"
+    depends_on:
+      - rabbitmq
+      - mongo
+      - keycloak
+
+  gateway:
+    build:
+      context: ./Gateway/Gateway
+      dockerfile: Gateway/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    ports:
+      - "5000:8080"
+    depends_on:
+      - partner-service
+      - user-service
+
+  frontend:
+    build:
+      context: ./Frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:5000
+    ports:
+      - "3000:80"
+    depends_on:
+      - gateway
+
+volumes:
+  postgres-data:
+  mongo-data:

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PartnerService.Core.Domain
 {
-    public class Activity
+    public class Activity : BaseEntity
     {
         public string Name { get; set; }
     }
