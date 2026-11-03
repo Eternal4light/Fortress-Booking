@@ -1,58 +1,50 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PartnerService.Core.Abstractions.Repositories;
 using PartnerService.Core.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace PartnerService.DataAccess.Repositories
 {
-    public class EfRepository<T>(DataContext context) : IRepository<T> where T: BaseEntity
+    /// <summary>
+    /// Реализация репозитория поверх EF Core (PostgreSQL). Данные сохраняются в реальной
+    /// базе данных и переживают перезапуск сервиса — в отличие от прежней in-memory версии.
+    /// </summary>
+    public class EfRepository<T> : IRepository<T> where T : BaseEntity
     {
-        private readonly DataContext _dataContext;
+        private readonly DataContext _context;
+        private readonly DbSet<T> _dbSet;
 
-        protected virtual IQueryable<T> ApplyIncludes(IQueryable<T> query) => query;
-
-        protected readonly DataContext _context = context;
-
-        protected readonly DbSet<T> _dbSet = context.Set<T>();
-
-        public async Task<IReadOnlyCollection<T>> GetAll(bool withIncludes = false, CancellationToken ct = default)
+        public EfRepository(DataContext context)
         {
-            IQueryable<T> query = _dbSet;
+            _context = context;
+            _dbSet = context.Set<T>();
+        }
 
-        if (withIncludes)
-            query = ApplyIncludes(query);
-
-        return await query.ToListAsync(ct);
+        public async Task<IReadOnlyCollection<T>> GetAllAsync()
+        {
+            return await _dbSet.AsNoTracking().ToListAsync();
         }
 
         public async Task<T> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return (await _dbSet.FindAsync(id))!;
         }
 
         public async Task AddAsync(T entity)
         {
-            throw new NotImplementedException();
+            _dbSet.Add(entity);
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(T entity)
         {
-            throw new NotImplementedException();
+            _dbSet.Update(entity);
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(T entity)
         {
-            throw new NotImplementedException();
-        }
-
-        Task<IReadOnlyCollection<T>> IRepository<T>.GetAllAsync()
-        {
-            throw new NotImplementedException();
+            _dbSet.Remove(entity);
+            await _context.SaveChangesAsync();
         }
     }
 }

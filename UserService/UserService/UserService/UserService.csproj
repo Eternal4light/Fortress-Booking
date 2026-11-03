@@ -8,12 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.9" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.2.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\" />
-    <Folder Include="Repositories\" />
+    <!-- Версии зафиксированы явно (а не "*"), чтобы пересборка без изменений в коде не
+         могла внезапно подтянуть новый мажорный релиз с breaking changes. -->
+    <PackageReference Include="RabbitMQ.Client" Version="7.2.2" />
+    <PackageReference Include="MongoDB.Driver" Version="3.12.0" />
   </ItemGroup>
 
 </Project>

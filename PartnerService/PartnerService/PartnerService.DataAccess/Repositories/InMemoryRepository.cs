@@ -3,8 +3,8 @@ using PartnerService.Core.Domain;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PartnerService.DataAccess.Repositories
 {
@@ -20,27 +20,31 @@ namespace PartnerService.DataAccess.Repositories
 
         public Task<IReadOnlyCollection<T>> GetAllAsync()
         {
-            return Task.FromResult((IReadOnlyCollection<T>)_data.Values);
+            return Task.FromResult((IReadOnlyCollection<T>)_data.Values.ToList());
         }
 
         public Task<T> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            _data.TryGetValue(id, out var entity);
+            return Task.FromResult(entity!);
         }
 
         public Task AddAsync(T entity)
         {
-            throw new NotImplementedException();
+            _data[entity.Id] = entity;
+            return Task.CompletedTask;
         }
 
         public Task UpdateAsync(T entity)
         {
-            throw new NotImplementedException();
+            _data[entity.Id] = entity;
+            return Task.CompletedTask;
         }
 
         public Task DeleteAsync(T entity)
         {
-            throw new NotImplementedException();
+            _data.TryRemove(entity.Id, out _);
+            return Task.CompletedTask;
         }
     }
 }
